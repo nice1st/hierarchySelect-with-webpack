@@ -1,0 +1,66 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NPM Webpack</title>
+</head>
+<body>
+  <div>
+    <button id="buttonEmit">emit</button>
+  </div>
+  <select id="select1" style="width: 150px;"></select>
+  <select id="select2" style="width: 150px;"></select>
+  <select id="select3" style="display: none;"></select>
+  <select id="select4" style="width: 150px;"></select>
+  <script type="text/javascript" src="/dist/hierarchySelct.js" defer></script>
+  <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(event) {
+      
+      const $select1 = document.getElementById("select1");
+      const $select2 = document.getElementById("select2");
+      const $select3 = document.getElementById("select3");
+      const $select4 = document.getElementById("select4");
+
+      const hierarchySelect1 = new ComponentModule.HierarchySelect($select1, {keyField: "key", displayField: "name", pKeyField: "p_key"});
+      const hierarchySelect2 = new ComponentModule.HierarchySelect($select2, {keyField: "key", displayField: "name", pKeyField: "p_key", parent: [hierarchySelect1]});
+      const hierarchySelect3 = new ComponentModule.HierarchySelect($select3, {keyField: "key", displayField: "name", pKeyField: "p_key", parent: [hierarchySelect2]});
+      const hierarchySelect4 = new ComponentModule.HierarchySelect($select4, {keyField: "key", displayField: "name", pKeyField: "p_key", parent: []});
+
+      let head = [];
+      fetch('../mok/head.json').then(response => response.json())
+      .then(function(json) {
+        head = json;
+        hierarchySelect1.setData(head);
+        hierarchySelect1.init();
+      });
+      let org = [];
+      fetch('../mok/org.json').then(response => response.json())
+      .then(function(json) {
+        org = json;
+        hierarchySelect2.setData(org);
+        hierarchySelect2.init();
+      });
+      
+      function setNetOptions() {
+        const selectedOrgs = hierarchySelect2.getSelectedDatas();
+        let nets = [];
+        for (let i = 0; i < selectedOrgs.length; i++) {
+          const org = selectedOrgs[i];
+          nets = nets.concat(org.lowest_children);
+        }
+
+        hierarchySelect4.setData(nets);
+        hierarchySelect4.refresh();
+      }
+
+      hierarchySelect2.addListener("init", function() {
+        hierarchySelect4.init();
+        setNetOptions();
+        hierarchySelect2.addListener("change", function() {
+          setNetOptions();
+        });
+      });
+    });
+  </script>
+</body>
+</html>
