@@ -14,5 +14,5 @@
   hierarchySelect2.init();
 </pre>
 * 이벤트
-  * init: 컴포넌트 초기화
-  * change: 선택 변경
+  * init: 컴포넌트 초기화 완료
+  * change: 선택 변경 
